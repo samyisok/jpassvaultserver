@@ -21,20 +21,16 @@ class FileController {
     this.repository = repository;
   }
 
-  // Aggregate root
-  // tag::get-aggregate-root[]
   @GetMapping("/files")
   List<File> all() {
     return repository.findAll();
   }
-  // end::get-aggregate-root[]
 
   @PostMapping("/files")
   File newFile(@RequestBody File newFile) {
     return repository.save(newFile);
   }
 
-  // Single item
 
   @GetMapping("/files/{id}")
   File one(@PathVariable Long id) {
