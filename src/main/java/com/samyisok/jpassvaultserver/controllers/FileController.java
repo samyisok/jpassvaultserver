@@ -1,4 +1,4 @@
-package com.samyisok.jpassvaultserver;
+package com.samyisok.jpassvaultserver.controllers;
 
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.samyisok.jpassvaultserver;
+package com.samyisok.jpassvaultserver.advices;
 
 
 import org.springframework.http.HttpStatus;
