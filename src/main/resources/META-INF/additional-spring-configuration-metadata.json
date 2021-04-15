@@ -11,6 +11,11 @@
       "name": "app-properties.secret-key",
       "type": "java.lang.String",
       "sourceType": "com.samyisok.jpassvaultserver.Properties"
+    },
+    {
+      "name": "app-properties.use-secret-key-from-env",
+      "type": "java.lang.String",
+      "description": "A description for 'app-properties.use-secret-key-from-env'"
     }
   ],
   "hints": []

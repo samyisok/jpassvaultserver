@@ -1,5 +1,7 @@
 package com.samyisok.jpassvaultserver;
 
+import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -7,19 +9,42 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "app-properties")
 public class AppProperties {
   private String secretKey;
+  private Boolean useSecretKeyFromEnv;
+
+  @Autowired
+  private Environment env;
 
   /**
-   * @return the key
+   * @return the secretKey
    */
   public String getSecretKey() {
     return secretKey;
   }
 
   /**
-   * @param secretKey the key to set
+   * @param secretKey the secretKey to set
    */
   public void setSecretKey(String secretKey) {
     this.secretKey = secretKey;
+  }
+
+
+  public String getEnvSecretKey() {
+    return env.getProperty("secret-key");
+  }
+
+  /**
+   * @return the useSecretKeyFromEnv
+   */
+  public Boolean getUseSecretKeyFromEnv() {
+    return useSecretKeyFromEnv;
+  }
+
+  /**
+   * @param useSecretKeyFromEnv the useSecretKeyFromEnv to set
+   */
+  public void setUseSecretKeyFromEnv(Boolean useSecretKeyFromEnv) {
+    this.useSecretKeyFromEnv = useSecretKeyFromEnv;
   }
 
   /*
@@ -30,6 +55,7 @@ public class AppProperties {
 
   @Override
   public String toString() {
-    return "Properties [key=" + secretKey + "]";
+    return "AppProperties [secretKey=" + secretKey + ", useSecretKeyFromEnv="
+        + useSecretKeyFromEnv + "]";
   }
 }

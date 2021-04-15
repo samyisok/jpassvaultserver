@@ -11,5 +11,4 @@ public class JpassvaultserverApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(JpassvaultserverApplication.class, args);
 	}
-
 }
