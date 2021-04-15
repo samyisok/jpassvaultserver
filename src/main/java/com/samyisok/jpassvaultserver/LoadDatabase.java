@@ -20,6 +20,7 @@ class LoadDatabase {
     return args -> {
       log.info("Preloading " + repository.save(new File("321")));
       log.info("Preloading " + repository.save(new File("123")));
+      log.info("Preloading " + repository.save(new File("last")));
       log.info("" + properties);
     };
   }
