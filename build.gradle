@@ -18,6 +18,18 @@ bootRun {
     environment = ["secret-key": "local-secret-key-test" ]
 }
 
+task debugRun(dependsOn:bootRun) {
+		group = 'Application'
+    gradle.taskGraph.whenReady { graph ->
+        if (graph.hasTask(debugRun)) {
+            bootRun {
+							  jvmArgs=["-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=33333"]
+                // debug = true
+            }
+        }
+    }
+}
+
 repositories {
 	mavenCentral()
 }
