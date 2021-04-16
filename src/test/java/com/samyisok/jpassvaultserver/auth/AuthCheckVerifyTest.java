@@ -4,7 +4,6 @@ package com.samyisok.jpassvaultserver.auth;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,19 +21,20 @@ class AuthCheckVerifyTest {
 
   @BeforeEach
   public void setUp() {
-    reset();
     when(authCheck.getKey()).thenReturn(envToken);
   }
 
   @Test
   void verifyShouldBeTrue() {
     assertTrue(authCheck.verify(envToken));
+    verify(authCheck, times(1)).getKey();
   }
 
   @Test
   void verifyShouldBeFalse() {
     String emptyToken = "";
     assertFalse(authCheck.verify(emptyToken));
+    verify(authCheck, times(1)).getKey();
   }
 
   @Test
