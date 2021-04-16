@@ -11,14 +11,17 @@ public class AuthCheck implements TokenVerifiable {
 
   @Override
   public boolean verify(String token) {
-    String key =
-        appProperties.getUseSecretKeyFromEnv() ? appProperties.getEnvSecretKey()
-            : appProperties.getSecretKey();
+    String key = getKey();
 
     if (key == null) {
       throw new RuntimeException("Key do not exists");
     }
 
     return key.equals(token);
+  }
+
+  public String getKey() {
+    return appProperties.getUseSecretKeyFromEnv() ? appProperties.getEnvSecretKey()
+        : appProperties.getSecretKey();
   }
 }
