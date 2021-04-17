@@ -20,7 +20,7 @@ public class AuthCheck implements TokenVerifiable {
     return key.equals(token);
   }
 
-  public String getKey() {
+  String getKey() {
     return appProperties.getUseSecretKeyFromEnv() ? appProperties.getEnvSecretKey()
         : appProperties.getSecretKey();
   }

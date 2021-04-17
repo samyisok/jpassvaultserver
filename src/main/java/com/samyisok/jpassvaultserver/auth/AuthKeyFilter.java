@@ -37,12 +37,16 @@ public class AuthKeyFilter extends GenericFilterBean {
       chain.doFilter(request, response);
     } else {
       log.info("Ivalid Token: " + token);
-      HttpServletResponse resp = (HttpServletResponse) response;
-      String error = "Invalid API KEY";
-      resp.reset();
-      resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      response.setContentLength(error.length());
-      response.getWriter().write(error);
+      responseWithError(response);
     }
+  }
+
+  private void responseWithError(ServletResponse response) throws IOException {
+    HttpServletResponse resp = (HttpServletResponse) response;
+    String error = "Invalid API KEY";
+    resp.reset();
+    resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.setContentLength(error.length());
+    response.getWriter().write(error);
   }
 }
