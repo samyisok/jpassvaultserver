@@ -20,6 +20,8 @@ public class AuthKeyFilter extends GenericFilterBean {
   @Autowired
   private AuthCheck authCheck;
 
+  static final String ERROR = "Invalid API KEY";
+
   @Override
   public void doFilter(ServletRequest request, ServletResponse response,
       FilterChain chain) throws IOException, ServletException {
@@ -43,10 +45,9 @@ public class AuthKeyFilter extends GenericFilterBean {
 
   private void responseWithError(ServletResponse response) throws IOException {
     HttpServletResponse resp = (HttpServletResponse) response;
-    String error = "Invalid API KEY";
     resp.reset();
     resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    response.setContentLength(error.length());
-    response.getWriter().write(error);
+    response.setContentLength(ERROR.length());
+    response.getWriter().write(ERROR);
   }
 }
