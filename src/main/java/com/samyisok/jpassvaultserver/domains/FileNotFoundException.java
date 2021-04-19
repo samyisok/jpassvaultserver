@@ -5,7 +5,7 @@ public class FileNotFoundException extends RuntimeException {
 
 
   public FileNotFoundException() {
-    super("Could not find file ");
+    super("Could not find file");
   }
 
   public FileNotFoundException(Long id) {

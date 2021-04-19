@@ -84,4 +84,11 @@ public class AuthKeyFilterDoFilterTest {
     authKeyFilter.doFilter(request, response, chain);
     verify(authKeyFilter, times(1)).responseWithError(response);
   }
+
+  @Test
+  void shouldCallResponseWithErrorIfTokenIsNull() throws Exception {
+    when(request.getHeader(anyString())).thenReturn(null);
+    authKeyFilter.doFilter(request, response, chain);
+    verify(authKeyFilter, times(1)).responseWithError(response);
+  }
 }
