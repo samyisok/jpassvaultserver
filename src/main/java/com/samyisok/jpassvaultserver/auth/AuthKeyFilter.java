@@ -37,7 +37,7 @@ public class AuthKeyFilter extends GenericFilterBean {
       logIp(httpRequest);
       chain.doFilter(request, response);
     } else {
-      getLogger().info("Ivalid Token: " + token);
+      getLogger().info("Invalid Token: " + token);
       responseWithError(response);
     }
   }
