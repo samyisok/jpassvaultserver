@@ -41,6 +41,7 @@ public class AuthKeyFilterDoFilterTest {
   @BeforeEach
   public void setUp() throws Exception {
     when(request.getHeader(anyString())).thenReturn(token);
+    when(authCheck.getKey()).thenReturn(token);
     when(authKeyFilter.getLogger()).thenReturn(logger);
     doNothing().when(authKeyFilter).logIp(request);
     doNothing().when(authKeyFilter).responseWithError(response);;
@@ -74,6 +75,7 @@ public class AuthKeyFilterDoFilterTest {
 
   @Test
   void shouldCallInfo() throws Exception {
+    when(authCheck.getKey()).thenReturn("another-token");
     authKeyFilter.doFilter(request, response, chain);
     verify(authKeyFilter, times(1)).getLogger();
     verify(logger, times(1)).info("Invalid Token: " + token);
@@ -81,6 +83,7 @@ public class AuthKeyFilterDoFilterTest {
 
   @Test
   void shouldCallResponseWithError() throws Exception {
+    when(authCheck.verify(token)).thenReturn(false);
     authKeyFilter.doFilter(request, response, chain);
     verify(authKeyFilter, times(1)).responseWithError(response);
   }
