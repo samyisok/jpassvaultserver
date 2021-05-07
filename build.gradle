@@ -15,6 +15,13 @@ configurations {
     }
 }
 
+
+jacocoTestReport {
+    reports {
+        csv.enabled true
+    }
+}
+
 bootRun {
     environment = ["secret-key": "local-secret-key-test" ]
 }
