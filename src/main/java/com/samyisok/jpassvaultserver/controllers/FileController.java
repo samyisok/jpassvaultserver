@@ -2,6 +2,7 @@ package com.samyisok.jpassvaultserver.controllers;
 
 
 
+import java.util.Map;
 import com.samyisok.jpassvaultserver.domains.File;
 import com.samyisok.jpassvaultserver.domains.FileNotFoundException;
 import com.samyisok.jpassvaultserver.domains.FileRepository;
@@ -19,6 +20,11 @@ class FileController {
 
   FileController(FileRepository repository) {
     this.repository = repository;
+  }
+
+  @GetMapping("/check")
+  Map<String, String> check() {
+    return Map.of("check", "ok");
   }
 
   @PostMapping("/files")
