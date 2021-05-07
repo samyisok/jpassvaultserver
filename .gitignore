@@ -37,3 +37,4 @@ out/
 .vscode/
 demodb.mv.db
 demodb.trace.db
+maindb.mv.db
