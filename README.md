@@ -1,0 +1,1 @@
+## Jpassvaultserver for solo user
