@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.samyisok'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
@@ -23,7 +23,7 @@ jacocoTestReport {
 }
 
 bootRun {
-    environment = ["secret-key": "local-secret-key-test" ]
+    environment = ["JPASSVAULT_SECRET": "local-secret-key-test" ]
 }
 
 task debugRun(dependsOn:bootRun) {
@@ -50,8 +50,8 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-  testImplementation 'org.mockito:mockito-inline:3.9.0'
-  testImplementation 'org.mockito:mockito-junit-jupiter:3.9.0'
+    testImplementation 'org.mockito:mockito-inline:3.9.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:3.9.0'
 	testImplementation 'org.mockito:mockito-core:3.9.0'
 }
 

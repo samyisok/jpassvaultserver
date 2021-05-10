@@ -30,7 +30,7 @@ public class AppProperties {
 
 
   public String getEnvSecretKey() {
-    return env.getProperty("secret-key");
+    return env.getProperty("JPASSVAULT_SECRET");
   }
 
   /**
