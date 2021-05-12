@@ -41,19 +41,17 @@ class FileController {
 
     String fileDb = file.getFile();
     MessageDigest md;
+    String checksum = "";
     try {
       md = MessageDigest.getInstance("MD5");
       md.update(fileDb.getBytes());
       byte[] digest = md.digest();
-      String checksum = DatatypeConverter
+      checksum = DatatypeConverter
           .printHexBinary(digest).toUpperCase();
-
-      return Map.of("hash", checksum);
     } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
     }
 
-    return Map.of("hash", null);
+    return Map.of("hash", checksum);
   }
 
   @PostMapping("/files")
