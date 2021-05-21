@@ -1,10 +1,12 @@
 package com.samyisok.jpassvaultserver.domains;
 
 import java.time.Instant;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,7 +15,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class File {
   private @Id @GeneratedValue Long id;
+
   // in Base64
+  @Lob
+  @Column(name = "file")
   private String file;
 
   @CreatedDate
