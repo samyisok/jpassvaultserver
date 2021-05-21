@@ -4,7 +4,7 @@
 
 Online sync service for [jpassvault](https://github.com/samyisok/jpassvault)
 
-# Install
+# Setup
 
 Build jar. 
 
@@ -34,7 +34,7 @@ Configure your service, and add secret key in Env params.
     RestartSec=30
     WorkingDirectory=/home/jpassvaultserver/
     Environment="JPASSVAULT_SECRET=*KEY_HERE*"
-    ExecStart=/usr/bin/java -jar jpassvaultserver-0.0.2-SNAPSHOT.jar
+    ExecStart=/usr/bin/java -jar jpassvaultserver-1.0.0.jar
     
     [Install]
     WantedBy=multi-user.target
@@ -49,3 +49,7 @@ Reload systemd and enable service:
 Check service, it should be in running state:
 
     sudo systemctl status example.service
+    
+Default port and address is 0.0.0.0:9393 but you can configure it from command line
+
+    java -jar jpassvaultserver-1.0.0.jar --server.port=8080
