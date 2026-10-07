@@ -54,9 +54,9 @@ See [`docs/operations.md`](docs/operations.md) for every setting and its default
 
 Backup, restore, upgrade, rollback, TLS, and troubleshooting:
 [`docs/operations.md`](docs/operations.md). CI and required checks:
-[`docs/ci.md`](docs/ci.md).
+[`docs/ci.md`](docs/ci.md). Release history: [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Contributing
 
-See [`AGENTS.md`](AGENTS.md) (added by the documentation change) and
-[`docs/ci.md`](docs/ci.md) for the local gates.
+Build, test, and project rules: [`AGENTS.md`](AGENTS.md). The API description is
+[`docs/openapi.yaml`](docs/openapi.yaml).

@@ -1,0 +1,194 @@
+openapi: 3.1.0
+info:
+  title: jpassvault sync server API
+  version: 2.0.0
+  description: >
+    Sync API used by the jpassvault desktop client. The service stores an
+    already-encrypted vault payload and answers change-detection checksum
+    requests. It never sees the master password. Every endpoint requires the
+    shared API secret in the `token` header; a missing or wrong token returns
+    HTTP 401 with the plain-text body `Invalid API KEY`.
+servers:
+  - url: https://sync.example.com
+    description: Deployed behind a TLS-terminating proxy (recommended)
+  - url: http://localhost:9393
+    description: Local development only
+tags:
+  - name: health
+  - name: files
+paths:
+  /check:
+    get:
+      tags: [health]
+      operationId: check
+      summary: Health and readiness
+      security:
+        - tokenAuth: []
+      responses:
+        '200':
+          description: The service is ready.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /files:
+    post:
+      tags: [files]
+      operationId: storeFile
+      summary: Store a vault payload
+      security:
+        - tokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FilePayload'
+      responses:
+        '200':
+          description: The stored payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoredFile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '411':
+          $ref: '#/components/responses/LengthRequired'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /files/last:
+    get:
+      tags: [files]
+      operationId: getLastFile
+      summary: Return the most recently stored payload
+      security:
+        - tokenAuth: []
+      responses:
+        '200':
+          description: The most recent payload.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoredFile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: No payload has been stored yet.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Could not find file
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /files/last/checksum:
+    get:
+      tags: [files]
+      operationId: getLastChecksum
+      summary: Return the change-detection value for the most recent payload
+      description: >
+        Returns the client-supplied integrity value stored with the newest
+        payload, or a SHA-256 hex fallback when none was supplied. The response
+        field is always `hash`.
+      security:
+        - tokenAuth: []
+      responses:
+        '200':
+          description: The change-detection value (`""` when nothing is stored).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HashResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+components:
+  securitySchemes:
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: token
+      description: Shared API secret configured as JPASSVAULT_SECRET.
+  schemas:
+    CheckResponse:
+      type: object
+      required: [check]
+      properties:
+        check:
+          type: string
+          example: ok
+    FilePayload:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          description: Base64-encoded encrypted vault payload.
+        checksum:
+          type: string
+          description: >
+            Optional client-supplied change-detection value (for example a
+            keyed HMAC). Stored opaquely and returned verbatim by the checksum
+            endpoint. Bounded in length.
+    StoredFile:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        file:
+          type: string
+        checksum:
+          type: string
+          nullable: true
+        createdDate:
+          type: string
+          format: date-time
+        modifiedDate:
+          type: string
+          format: date-time
+    HashResponse:
+      type: object
+      required: [hash]
+      properties:
+        hash:
+          type: string
+    ErrorText:
+      type: string
+  responses:
+    Unauthorized:
+      description: Missing or invalid token.
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: Invalid API KEY
+    LengthRequired:
+      description: A request body was sent without a Content-Length.
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: Payload Too Large
+    PayloadTooLarge:
+      description: The payload exceeds the configured maximum.
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: Payload Too Large
+    TooManyRequests:
+      description: Too many failed authentication attempts from this source.
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: Too Many Requests

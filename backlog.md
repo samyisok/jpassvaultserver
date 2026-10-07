@@ -48,5 +48,13 @@ workflow; address later.
 - A hard kill (SIGKILL) can lose recent H2 MVStore writes; backups require a
   graceful stop (documented).
 
+## Deferred from add-project-documentation
+
+- No strict OpenAPI linter (Redocly/Spectral) is installed; the spec is
+  YAML-parsed and structurally checked only. Consider adding one to CI.
+- `CHANGELOG.md` has only an `[Unreleased]` section; the first tagged release
+  will add a version section.
+
+
 
 
