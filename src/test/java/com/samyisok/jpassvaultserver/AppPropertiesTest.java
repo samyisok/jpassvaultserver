@@ -10,31 +10,31 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 @SpringBootTest
 class AppPropertiesTest {
 
-	@MockitoSpyBean
-	AppProperties appProperties;
+    @MockitoSpyBean
+    AppProperties appProperties;
 
-	@BeforeEach
-	void setUp() {
-		appProperties.setSecretKey("secretKey");
-		appProperties.setUseSecretKeyFromEnv(true);
-	}
+    @BeforeEach
+    void setUp() {
+        appProperties.setSecretKey("secretKey");
+        appProperties.setUseSecretKeyFromEnv(true);
+    }
 
-	@Test
-	void shouldGetSecretKey() {
-		String secretKey = appProperties.getSecretKey();
-		assertEquals(secretKey, "secretKey");
-	}
+    @Test
+    void shouldGetSecretKey() {
+        String secretKey = appProperties.getSecretKey();
+        assertEquals(secretKey, "secretKey");
+    }
 
-	@Test
-	void shouldGetUseSecretKeyFromEnv() {
-		assertTrue(appProperties.getUseSecretKeyFromEnv());
-	}
+    @Test
+    void shouldGetUseSecretKeyFromEnv() {
+        assertTrue(appProperties.getUseSecretKeyFromEnv());
+    }
 
-	@Test
-	void shouldGetObjectDumpFromToString() {
-		String dump = appProperties.toString();
+    @Test
+    void shouldGetObjectDumpFromToString() {
+        String dump = appProperties.toString();
 
-		assertEquals(dump, "AppProperties [secretKey=****, useSecretKeyFromEnv=true]");
-	}
+        assertEquals(dump, "AppProperties [secretKey=****, useSecretKeyFromEnv=true]");
+    }
 
 }

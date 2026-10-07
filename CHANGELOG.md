@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add a CI pipeline with build/test, an enforced coverage floor, Checkstyle, dependency vulnerability scanning, CodeQL, Dependabot, and a tag-triggered release workflow. (`2026-10-07-add-ci-pipeline`)
+
 ### Changed
 
 - Upgrade the sync server to Java 25 and Spring Boot 4.1.1 (Jakarta namespace) on Gradle 9.8.1; the HTTP API and stored data are unchanged. (`2026-10-07-modernize-java-stack`)
