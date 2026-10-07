@@ -52,6 +52,11 @@ checkstyle {
 
 check.dependsOn jacocoTestCoverageVerification
 
+// Only the executable Spring Boot jar is produced by the default build.
+jar {
+	enabled = false
+}
+
 repositories {
 	mavenCentral()
 }

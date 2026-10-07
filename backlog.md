@@ -32,3 +32,13 @@ workflow; address later.
 - Filter ordering (`AuthKeyFilter`, `SecurityHeadersFilter`, `RequestSizeLimitFilter`)
   is not explicitly ordered; add `@Order` if interactions become significant.
 
+## Deferred from add-release-packaging
+
+- Task 5.1 (push a real version tag and inspect release assets / GHCR tag) requires
+  a remote push; verified locally with the built jar and container image instead.
+- The release workflow tags the image `:latest` on every release; only the newest
+  stable release should move `latest`. Add pre-release handling.
+- Consider image signing / build provenance (cosign / SLSA) — recorded as an Open
+  Question in the change design.
+
+
