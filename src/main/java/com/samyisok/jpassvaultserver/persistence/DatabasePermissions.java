@@ -34,16 +34,41 @@ public final class DatabasePermissions {
     return Path.of(location).toAbsolutePath().normalize();
   }
 
+  /** The directory that holds the database, or null for a non-file datasource. */
+  public static Path dataDirectoryFor(String datasourceUrl) {
+    Path databaseFile = h2DatabaseFile(datasourceUrl);
+    return databaseFile == null ? null : databaseFile.getParent();
+  }
+
+  /**
+   * Creates the directory (if needed) and, on POSIX systems, restricts it to the
+   * owning user. Safe to call before the database exists.
+   */
+  public static void ensureOwnerOnlyDirectory(Path directory) {
+    if (directory == null) {
+      return;
+    }
+    try {
+      Files.createDirectories(directory);
+      if (supportsPosix()) {
+        setPermissions(directory, DIRECTORY_PERMISSIONS);
+      }
+    } catch (IOException e) {
+      throw new IllegalStateException(
+          "Could not prepare database directory " + directory, e);
+    }
+  }
+
+  /**
+   * Tightens the directory and the database files (including H2 auxiliary files)
+   * to owner-only on POSIX systems. Called after the database has been opened.
+   */
   public static void applyOwnerOnlyPermissions(Path databaseFile) {
     if (databaseFile == null || !supportsPosix()) {
       return;
     }
     try {
-      Path directory = databaseFile.getParent();
-      if (directory != null) {
-        Files.createDirectories(directory);
-        setPermissions(directory, DIRECTORY_PERMISSIONS);
-      }
+      ensureOwnerOnlyDirectory(databaseFile.getParent());
       for (Path candidate : new Path[] {databaseFile,
           databaseFile.resolveSibling(databaseFile.getFileName() + H2_DATABASE_SUFFIX),
           databaseFile.resolveSibling(databaseFile.getFileName() + ".lock.db"),
@@ -55,17 +80,6 @@ public final class DatabasePermissions {
     } catch (IOException e) {
       throw new IllegalStateException(
           "Could not restrict database permissions for " + databaseFile, e);
-    }
-  }
-
-  public static void validateCredentials(String username, String password) {
-    if (username != null && (username.isBlank() || "sa".equalsIgnoreCase(username))) {
-      throw new IllegalStateException(
-          "Database username must not be blank or the default 'sa'");
-    }
-    if (password != null
-        && (password.isBlank() || "sa".equals(password) || "password".equals(password))) {
-      throw new IllegalStateException("Database password must not be blank or a default value");
     }
   }
 

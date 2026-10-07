@@ -21,7 +21,7 @@ A release SHALL publish a runnable Spring Boot jar named with the release versio
 
 ### Requirement: Published container image
 
-A release SHALL publish an OCI container image containing the application and a Java 25 runtime, running as a non-root user, exposing the service port, and declaring a health check against the service.
+A release SHALL publish an OCI container image containing the application and a Java 25 runtime, running as a non-root user, exposing the service port, and declaring a health check against the service. The image SHALL be tagged with the release version, and the `latest` tag SHALL move only for the newest stable (non-pre-release) release.
 
 #### Scenario: Image is published with the version tag
 
@@ -37,6 +37,11 @@ A release SHALL publish an OCI container image containing the application and a 
 
 - **WHEN** the container is running and the service is ready
 - **THEN** the declared health check reports the container as healthy
+
+#### Scenario: Pre-release does not move latest
+
+- **WHEN** a pre-release version tag is pushed
+- **THEN** the image is tagged with the version but the `latest` tag is unchanged
 
 ### Requirement: Integrity metadata accompanies the release
 

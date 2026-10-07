@@ -8,14 +8,17 @@ info:
     requests. It never sees the master password. Every endpoint requires the
     shared API secret in the `token` header; a missing or wrong token returns
     HTTP 401 with the plain-text body `Invalid API KEY`.
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
 servers:
-  - url: https://sync.example.com
-    description: Deployed behind a TLS-terminating proxy (recommended)
-  - url: http://localhost:9393
-    description: Local development only
+  - url: https://sync.internal
+    description: Deployed behind a TLS-terminating proxy (replace with your host)
 tags:
   - name: health
+    description: Service health and readiness.
   - name: files
+    description: Stored vault payloads and change detection.
 paths:
   /check:
     get:
@@ -154,8 +157,7 @@ components:
         file:
           type: string
         checksum:
-          type: string
-          nullable: true
+          type: [string, 'null']
         createdDate:
           type: string
           format: date-time
@@ -168,8 +170,6 @@ components:
       properties:
         hash:
           type: string
-    ErrorText:
-      type: string
   responses:
     Unauthorized:
       description: Missing or invalid token.

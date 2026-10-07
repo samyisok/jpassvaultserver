@@ -10,13 +10,7 @@ import org.springframework.core.env.Environment;
 class LoadDatabase {
   @Bean
   CommandLineRunner initDatabase(Environment environment) {
-    return args -> {
-      String datasourceUrl = environment.getProperty("spring.datasource.url");
-      DatabasePermissions
-          .applyOwnerOnlyPermissions(DatabasePermissions.h2DatabaseFile(datasourceUrl));
-      DatabasePermissions.validateCredentials(
-          environment.getProperty("spring.datasource.username"),
-          environment.getProperty("spring.datasource.password"));
-    };
+    return args -> DatabasePermissions.applyOwnerOnlyPermissions(
+        DatabasePermissions.h2DatabaseFile(environment.getProperty("spring.datasource.url")));
   }
 }

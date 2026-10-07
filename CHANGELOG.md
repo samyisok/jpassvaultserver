@@ -9,15 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add `app-properties.tls-terminated-at-proxy` as a distinct transport acknowledgment for proxy-terminated TLS, separate from the development-only plain-HTTP flag. (`stabilize-persistence-and-operations`)
+
 ### Changed
+
+- Store the H2 database in a dedicated owner-only `./data` directory by default (was the process working directory) and create it before startup; existing deployments that relied on the default must set `SPRING_DATASOURCE_URL` to keep their previous database file. (`stabilize-persistence-and-operations`)
+- Give the security filters a defined order so authentication is evaluated before payload limits (`401` takes precedence over `411`/`413`). (`stabilize-persistence-and-operations`)
+- Base `File` equality and hashing on the persistent id instead of the payload. (`stabilize-persistence-and-operations`)
 
 ### Deprecated
 
 ### Removed
 
+- Remove database-credential validation; the embedded, single-writer H2 file is protected by owner-only filesystem permissions. (`stabilize-persistence-and-operations`)
+
 ### Fixed
 
 ### Security
+
+- Pin third-party GitHub Actions to immutable commit SHAs, lint the OpenAPI specification in CI, and move the container `latest` tag only for stable releases. (`stabilize-persistence-and-operations`)
 
 ## [2.1.0] - 2026-10-07
 

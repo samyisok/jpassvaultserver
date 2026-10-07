@@ -2,8 +2,8 @@
 # Build after `./gradlew clean bootJar`:
 #   docker build -t jpassvaultserver .
 # The service requires JPASSVAULT_SECRET and runs as a non-root user. TLS is
-# expected to terminate at the edge; pass app-properties.allow-plain-http=true
-# only when running behind a trusted TLS proxy.
+# expected to terminate at the edge; set
+# app-properties.tls-terminated-at-proxy=true behind a trusted TLS proxy.
 FROM eclipse-temurin:25-jre
 
 RUN apt-get update \

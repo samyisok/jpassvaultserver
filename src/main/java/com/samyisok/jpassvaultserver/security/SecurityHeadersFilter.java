@@ -5,10 +5,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
+@Order(1)
 public class SecurityHeadersFilter extends OncePerRequestFilter {
   static final String NOSNIFF_HEADER = "X-Content-Type-Options";
   static final String NOSNIFF_VALUE = "nosniff";

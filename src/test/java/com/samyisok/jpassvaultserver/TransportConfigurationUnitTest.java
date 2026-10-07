@@ -11,20 +11,27 @@ class TransportConfigurationUnitTest {
     AppProperties properties = new AppProperties();
 
     assertThrows(IllegalStateException.class,
-        () -> properties.validateTransport(false, false));
+        () -> properties.validateTransport(false, false, false));
   }
 
   @Test
   void allowsTlsConfigured() {
     AppProperties properties = new AppProperties();
 
-    assertDoesNotThrow(() -> properties.validateTransport(true, false));
+    assertDoesNotThrow(() -> properties.validateTransport(true, false, false));
   }
 
   @Test
   void allowsExplicitPlainHttpAcknowledgment() {
     AppProperties properties = new AppProperties();
 
-    assertDoesNotThrow(() -> properties.validateTransport(false, true));
+    assertDoesNotThrow(() -> properties.validateTransport(false, true, false));
+  }
+
+  @Test
+  void allowsProxyTerminatedTlsAcknowledgment() {
+    AppProperties properties = new AppProperties();
+
+    assertDoesNotThrow(() -> properties.validateTransport(false, false, true));
   }
 }

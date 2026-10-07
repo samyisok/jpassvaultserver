@@ -28,6 +28,11 @@
       "sourceType": "com.samyisok.jpassvaultserver.AppProperties"
     },
     {
+      "name": "app-properties.tls-terminated-at-proxy",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.samyisok.jpassvaultserver.AppProperties"
+    },
+    {
       "name": "app-properties.max-payload-size",
       "type": "java.lang.Long",
       "sourceType": "com.samyisok.jpassvaultserver.AppProperties"

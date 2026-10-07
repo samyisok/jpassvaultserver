@@ -17,13 +17,14 @@ already-encrypted data; it never sees the master password.
 
 ```sh
 ./gradlew build
-JPASSVAULT_SECRET=change-me \
+JPASSVAULT_SECRET=change-me-change-me \
   APP_PROPERTIES_ALLOW_PLAIN_HTTP=true \
   java -jar build/libs/jpassvaultserver-2.1.0.jar
 ```
 
-The server refuses to start without a secret, and without TLS unless the
-plain-HTTP acknowledgment is set.
+The server refuses to start without a secret, and without a transport
+acknowledgment. Its database is a persistent H2 file under `./data` by default
+(owner-only); override it with `SPRING_DATASOURCE_URL`.
 
 ## API
 

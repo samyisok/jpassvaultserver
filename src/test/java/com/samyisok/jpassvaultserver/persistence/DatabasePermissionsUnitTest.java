@@ -3,7 +3,7 @@ package com.samyisok.jpassvaultserver.persistence;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -31,6 +31,35 @@ class DatabasePermissionsUnitTest {
   }
 
   @Test
+  void resolvesDataDirectory() {
+    Path expected = tempDir.resolve("data");
+
+    assertEquals(expected,
+        DatabasePermissions.dataDirectoryFor("jdbc:h2:file:" + expected.resolve("maindb")));
+    assertNull(DatabasePermissions.dataDirectoryFor("jdbc:h2:mem:testdb"));
+    assertNull(DatabasePermissions.dataDirectoryFor(null));
+  }
+
+  @Test
+  void createsOwnerOnlyDirectory() throws IOException {
+    assumeTrue(supportsPosix());
+    Path directory = tempDir.resolve("data");
+
+    DatabasePermissions.ensureOwnerOnlyDirectory(directory);
+
+    assertEquals("rwx------",
+        PosixFilePermissions.toString(Files.getPosixFilePermissions(directory)));
+  }
+
+  @Test
+  void createsDirectoryWithoutPosix() throws IOException {
+    Path directory = tempDir.resolve("plain");
+
+    assertDoesNotThrow(() -> DatabasePermissions.ensureOwnerOnlyDirectory(directory));
+    assertTrue(Files.isDirectory(directory));
+  }
+
+  @Test
   void appliesOwnerOnlyPermissions() throws IOException {
     assumeTrue(supportsPosix());
     Path directory = tempDir.resolve("data");
@@ -49,22 +78,7 @@ class DatabasePermissionsUnitTest {
   @Test
   void ignoresNonFileDatabase() {
     assertDoesNotThrow(() -> DatabasePermissions.applyOwnerOnlyPermissions(null));
-  }
-
-  @Test
-  void rejectsBlankOrDefaultCredentials() {
-    assertThrows(IllegalStateException.class,
-        () -> DatabasePermissions.validateCredentials("  ", null));
-    assertThrows(IllegalStateException.class,
-        () -> DatabasePermissions.validateCredentials("sa", ""));
-    assertThrows(IllegalStateException.class,
-        () -> DatabasePermissions.validateCredentials("sa", "sa"));
-    assertThrows(IllegalStateException.class,
-        () -> DatabasePermissions.validateCredentials("SA", "strong-pass"));
-    assertThrows(IllegalStateException.class,
-        () -> DatabasePermissions.validateCredentials("sa", "password"));
-    assertDoesNotThrow(() -> DatabasePermissions.validateCredentials(null, null));
-    assertDoesNotThrow(() -> DatabasePermissions.validateCredentials("user", "strong-pass"));
+    assertDoesNotThrow(() -> DatabasePermissions.ensureOwnerOnlyDirectory(null));
   }
 
   private static boolean supportsPosix() {

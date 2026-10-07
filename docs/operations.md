@@ -13,8 +13,9 @@ container `env_file`). Spring Boot relaxed binding maps them to properties.
 | `JPASSVAULT_SECRET` | — (required) | API secret. Startup fails if empty or equal to the old committed placeholder. |
 | `SERVER_ADDRESS` | `0.0.0.0` | Listen address. Bind loopback when a reverse proxy fronts the service. |
 | `SERVER_PORT` | `9393` | Listen port. |
-| `SPRING_DATASOURCE_URL` | `jdbc:h2:file:./maindb` | H2 database location. Point it at the persistent, owner-only data directory. |
-| `APP_PROPERTIES_ALLOW_PLAIN_HTTP` | `false` | Acknowledges cleartext HTTP. Set only behind a trusted TLS proxy; otherwise startup fails. |
+| `SPRING_DATASOURCE_URL` | `jdbc:h2:file:./data/maindb` | H2 database location. Point it at the persistent, owner-only data directory. |
+| `APP_PROPERTIES_ALLOW_PLAIN_HTTP` | `false` | Development-only: acknowledges cleartext HTTP. Do not use in production. |
+| `APP_PROPERTIES_TLS_TERMINATED_AT_PROXY` | `false` | Acknowledges that a trusted reverse proxy terminates TLS. Use this for proxy deployments. |
 | `APP_PROPERTIES_TRUST_PROXY_HEADERS` | `false` | Trust `X-Forwarded-For`/`Forwarded` from a known proxy. Uses the right-most hop. |
 | `APP_PROPERTIES_MAX_PAYLOAD_SIZE` | `10485760` | Maximum stored vault payload size. |
 
@@ -22,16 +23,19 @@ Keep the environment file owner-only (`0600`): it holds the API secret.
 
 ## TLS
 
-The server refuses to start without TLS unless
-`APP_PROPERTIES_ALLOW_PLAIN_HTTP=true`. Two supported shapes:
+The server refuses to start without TLS unless one of the transport
+acknowledgments is set. Two supported shapes:
 
 - **Terminate at a proxy (recommended).** Run a TLS-terminating reverse proxy in
-  front, bind the server to loopback, and set `APP_PROPERTIES_ALLOW_PLAIN_HTTP=true`
-  (the proxy hop is trusted and local). Set
+  front, bind the server to loopback, and set
+  `APP_PROPERTIES_TLS_TERMINATED_AT_PROXY=true`. Set
   `APP_PROPERTIES_TRUST_PROXY_HEADERS=true` only if you need the real client
   address in logs.
 - **Terminate in-process.** Configure `server.ssl.key-store` (and
-  `server.ssl.enabled=true`); the plain-HTTP acknowledgment is then unnecessary.
+  `server.ssl.enabled=true`); no acknowledgment is then necessary.
+
+`APP_PROPERTIES_ALLOW_PLAIN_HTTP=true` exists for local development only; it does
+not assert that a proxy is present.
 
 ## systemd
 
@@ -91,6 +95,11 @@ Verify with `GET /files/last` that the expected record is present.
 
 ## Upgrade and rollback
 
+> **Database location changed in 2.1.0.** The default database moved from
+> `./maindb` (process working directory) to `./data/maindb`. An existing
+> deployment that relied on the default must set `SPRING_DATASOURCE_URL` to its
+> previous file, otherwise the service starts with a new, empty database.
+
 Upgrade:
 
 1. Back up the data directory.
@@ -108,8 +117,8 @@ Rollback:
 
 - **Startup fails: "No API secret configured"** — set `JPASSVAULT_SECRET`.
 - **Startup fails: "previously committed placeholder value"** — choose a new secret.
-- **Startup fails: "Refusing to start without TLS"** — configure TLS or set the
-  plain-HTTP acknowledgment behind a trusted proxy.
+- **Startup fails: "Refusing to start without TLS"** — configure TLS, or set
+  `APP_PROPERTIES_TLS_TERMINATED_AT_PROXY=true` behind a trusted TLS proxy.
 - **`401` on every request** — the client's `token` header does not match
   `JPASSVAULT_SECRET`.
 - **`429 Too Many Requests`** — too many failed authentication attempts from the

@@ -59,22 +59,16 @@ public class IntergrationFileTest {
 
   @Test
   void shouldGetHashCode() {
-    assertEquals(31 * 1 + base64.hashCode(), file.hashCode());
-    assertEquals(31 * 1 + 0, new File().hashCode());
+    assertEquals(file.getId().hashCode(), outputFile.hashCode());
   }
 
   @Test
   void equalsShouldWork() {
     assertTrue(outputFile.equals(file));
     assertTrue(outputFile.equals(outputFile));
-    assertTrue(outputFile.equals(new File(base64)));
-    assertFalse(outputFile.equals(new File("test")));
+    assertFalse(outputFile.equals(new File(base64)));
     assertFalse(outputFile.equals(new Object()));
     assertFalse(outputFile.equals(null));
-    outputFile.setFile(null);
-    assertFalse(outputFile.equals(file));
-    file.setFile(null);
-    assertTrue(outputFile.equals(file));
   }
 
   @Test

@@ -76,21 +76,20 @@ public class File {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((file == null) ? 0 : file.hashCode());
-    return result;
+    // Persistent identity; unsaved instances fall back to identity so the
+    // payload is never hashed.
+    return id == null ? System.identityHashCode(this) : id.hashCode();
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
 
@@ -101,12 +100,7 @@ public class File {
     if (!(obj instanceof File))
       return false;
     File other = (File) obj;
-    if (file == null) {
-      if (other.file != null)
-        return false;
-    } else if (!file.equals(other.file))
-      return false;
-    return true;
+    return id != null && id.equals(other.id);
   }
 
   /*

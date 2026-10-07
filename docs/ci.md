@@ -3,13 +3,17 @@
 ## Workflows
 
 - `.github/workflows/gradle.yml` — CI: build, tests, JaCoCo coverage
-  verification, Checkstyle, dependency vulnerability scan, report upload.
-  Runs on every push to `main` and every pull request targeting `main`.
+  verification, Checkstyle, OpenAPI lint, dependency vulnerability scan, report
+  upload. Runs on every push to `main` and every pull request targeting `main`.
 - `.github/workflows/codeql.yml` — CodeQL analysis on push/PR and weekly.
 - `.github/workflows/release.yml` — tag-triggered release; verifies the tag
-  matches `build.gradle`'s `version`, builds the jar, and publishes a GitHub
-  release.
+  matches `build.gradle`'s `version`, builds the jar, generates an SBOM and
+  checksums, pushes the image (moving `latest` only for stable versions), and
+  publishes a GitHub release.
 - `.github/dependabot.yml` — weekly Gradle and GitHub Actions update proposals.
+
+Third-party Actions are pinned to immutable commit SHAs (with a `# vX` comment);
+Dependabot keeps the pins current.
 
 ## Required status checks
 

@@ -22,6 +22,7 @@ public class AppProperties {
   private Boolean useSecretKeyFromEnv = Boolean.TRUE;
   private Boolean trustProxyHeaders = Boolean.FALSE;
   private Boolean allowPlainHttp = Boolean.FALSE;
+  private Boolean tlsTerminatedAtProxy = Boolean.FALSE;
   private Long maxPayloadSize = DEFAULT_MAX_PAYLOAD_SIZE;
 
   @Autowired
@@ -30,7 +31,8 @@ public class AppProperties {
   @PostConstruct
   public void validateConfiguration() {
     validateSecret(getEffectiveSecretKey());
-    validateTransport(isTlsConfigured(), Boolean.TRUE.equals(allowPlainHttp));
+    validateTransport(isTlsConfigured(), Boolean.TRUE.equals(allowPlainHttp),
+        Boolean.TRUE.equals(tlsTerminatedAtProxy));
   }
 
   void validateSecret(String secret) {
@@ -52,10 +54,11 @@ public class AppProperties {
     }
   }
 
-  void validateTransport(boolean tlsConfigured, boolean plainHttpAllowed) {
-    if (!tlsConfigured && !plainHttpAllowed) {
+  void validateTransport(boolean tlsConfigured, boolean plainHttpAllowed,
+      boolean proxyTlsTerminated) {
+    if (!tlsConfigured && !plainHttpAllowed && !proxyTlsTerminated) {
       throw new IllegalStateException(
-          "Refusing to start without TLS: configure server.ssl.* or set app-properties.allow-plain-http=true for local development only");
+          "Refusing to start without TLS: configure server.ssl.*, set app-properties.tls-terminated-at-proxy=true behind a trusted TLS proxy, or set app-properties.allow-plain-http=true for local development only");
     }
   }
 
@@ -107,6 +110,14 @@ public class AppProperties {
 
   public void setAllowPlainHttp(Boolean allowPlainHttp) {
     this.allowPlainHttp = allowPlainHttp;
+  }
+
+  public Boolean getTlsTerminatedAtProxy() {
+    return tlsTerminatedAtProxy;
+  }
+
+  public void setTlsTerminatedAtProxy(Boolean tlsTerminatedAtProxy) {
+    this.tlsTerminatedAtProxy = tlsTerminatedAtProxy;
   }
 
   public Long getMaxPayloadSize() {

@@ -20,9 +20,9 @@ PrivateTmp=true
 UMask=0077
 ReadWritePaths=/var/lib/jpassvaultserver
 
-# TLS is expected to terminate at a reverse proxy. Only set
-# APP_PROPERTIES_ALLOW_PLAIN_HTTP=true in /etc/jpassvaultserver.env when the
-# service is reachable only through a trusted TLS-terminating proxy.
+# TLS is expected to terminate at a reverse proxy. Set
+# APP_PROPERTIES_TLS_TERMINATED_AT_PROXY=true in /etc/jpassvaultserver.env when
+# the service is reachable only through a trusted TLS-terminating proxy.
 
 [Install]
 WantedBy=multi-user.target
