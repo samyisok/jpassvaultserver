@@ -15,7 +15,7 @@ WORKDIR /app
 
 COPY --chown=app:app build/libs/jpassvaultserver-*.jar /app/app.jar
 
-RUN mkdir -p /app/data && chown -R app:app /app
+RUN install -d -m 0700 -o app -g app /app/data && chown -R app:app /app
 
 USER app
 

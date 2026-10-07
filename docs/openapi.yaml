@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: jpassvault sync server API
-  version: 2.0.0
+  version: 2.1.0
   description: >
     Sync API used by the jpassvault desktop client. The service stores an
     already-encrypted vault payload and answers change-detection checksum
@@ -50,11 +50,18 @@ paths:
               $ref: '#/components/schemas/FilePayload'
       responses:
         '200':
-          description: The stored payload.
+          description: The stored payload. Only the newest payload is retained.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/StoredFile'
+        '400':
+          description: The `file` field is missing or blank.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: file is required
         '401':
           $ref: '#/components/responses/Unauthorized'
         '411':

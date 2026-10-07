@@ -1,6 +1,7 @@
 package com.samyisok.jpassvaultserver.domains;
 
 import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -45,6 +46,7 @@ public class File {
   /**
    * @return the id
    */
+  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   public Long getId() {
     return id;
   }

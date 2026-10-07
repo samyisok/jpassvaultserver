@@ -1,60 +1,55 @@
 # Backlog
 
-Deferred items found during autonomous implementation. Not blocking the current
-workflow; address later.
+Deferred items. Not blocking; address later.
 
-## Pre-existing design smells
+## Data-at-rest / database
 
-- `src/main/java/com/samyisok/jpassvaultserver/domains/File.java` — JPA
-  (`@Entity`, `@Column`, `@Lob`) annotations and an anemic model inside the
-  `domains` package. Consider separating a persistence entity from a domain
-  object or renaming the package to reflect it is persistence-only. Surfaced by
-  the DDD review during `modernize-java-stack`.
-- `FileController` computed the integrity hash itself; resolved by
-  `harden-server-security` (checksum handling + MD5 removal). Re-check after
-  that change lands.
-
-## Deferred from harden-server-security (security review residuals)
-
-- H2 database default credentials (`sa`/empty) remain in effect when no
+- H2 implicit `sa`/empty credentials are still in effect when no
   `spring.datasource.username`/`password` are configured. The change rejects only
-  explicitly-configured blank/default credentials. Fail-closed enforcement needs
-  a credential bootstrap that runs before the DataSource initialises. Tracked by
-  `add-installation` (configuration surface) and this item.
+  explicitly-configured blank/default credentials; the server-security spec says
+  default credentials should be rejected. Fail-closed enforcement needs a
+  credential bootstrap that runs before the DataSource initialises.
 - `jdbc:h2:file:./maindb` makes the process working directory the "database
-  directory", which is chmod'd `0700`; use a dedicated data directory (for example
-  `./data/maindb`) and scope permission tightening to it. Also cover H2 auxiliary
-  files (`.lock.db`, `.trace.db`).
-- Edge-terminated TLS currently requires `allow-plain-http=true`, which also
-  disables the TLS guard. Add a distinct edge-TLS acknowledgment.
+  directory", which is chmod'd `0700`; use a dedicated data directory (for
+  example `./data/maindb`) and scope permission tightening to it.
+- A hard kill (SIGKILL) can lose recent H2 MVStore writes; backups require a
+  graceful stop (documented in `docs/operations.md`).
+
+## Security / transport
+
+- Edge-terminated TLS still requires `allow-plain-http=true`, which also disables
+  the TLS guard. Add a distinct edge-TLS acknowledgment.
 - Auth throttle is in-memory, per-instance, and resets on restart; document and
   rely on edge-level rate limiting for global protection.
-- Filter ordering (`AuthKeyFilter`, `SecurityHeadersFilter`, `RequestSizeLimitFilter`)
-  is not explicitly ordered; add `@Order` if interactions become significant.
+- Filter ordering (`AuthKeyFilter`, `SecurityHeadersFilter`,
+  `RequestSizeLimitFilter`) is not explicitly ordered; add `@Order` if
+  interactions become significant.
+- Health check passes the token via curl arguments (visible in `/proc` inside the
+  container); consider a token file or a dedicated readiness path.
 
-## Deferred from add-release-packaging
+## Release / supply chain
 
-- Task 5.1 (push a real version tag and inspect release assets / GHCR tag) requires
-  a remote push; verified locally with the built jar and container image instead.
-- The release workflow tags the image `:latest` on every release; only the newest
-  stable release should move `latest`. Add pre-release handling.
-- Consider image signing / build provenance (cosign / SLSA) — recorded as an Open
-  Question in the change design.
-
-## Deferred from add-installation
-
+- Not all third-party GitHub Actions are pinned to full commit SHAs (the
+  dependency-scan action is; others use major tags).
+- The release workflow moves `:latest` on every tag; only the newest stable
+  release should. Add pre-release handling.
+- Consider image signing (cosign) beyond the buildx provenance attestation.
 - `deploy/install.sh` was syntax-checked and the systemd unit verified, but not
-  executed as root on this host. First real install is the true check.
-- A hard kill (SIGKILL) can lose recent H2 MVStore writes; backups require a
-  graceful stop (documented).
+  executed as root on a dev host. First real install is the true check.
 
-## Deferred from add-project-documentation
+## Documentation / tooling
 
 - No strict OpenAPI linter (Redocly/Spectral) is installed; the spec is
   YAML-parsed and structurally checked only. Consider adding one to CI.
-- `CHANGELOG.md` has only an `[Unreleased]` section; the first tagged release
-  will add a version section.
+- Consider a MockMvc/web-layer test that exercises the real filter chain
+  (401/400/411/413/429 and filter ordering) end to end.
 
+## Pre-existing design smells
 
-
-
+- `domains/File.java` is a JPA entity with `@Entity`/`@Column`/`@Lob` and an
+  anemic model inside the `domains` package. Consider separating persistence from
+  the domain or renaming the package.
+- `FileController` holds a payload-size business rule and talks directly to the
+  repository; no application-service boundary.
+- `File.equals`/`hashCode` hash the full payload; base them on `id` if these
+  entities ever land in hash collections.

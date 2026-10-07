@@ -60,4 +60,22 @@ class FileControllerPayloadSizeUnitTest {
     assertEquals(accepted, result);
     verify(repository, times(1)).save(accepted);
   }
+
+  @Test
+  void rejectsBlankPayloadWithBadRequest() {
+    ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        () -> fileController.newFile(new File("   ")));
+
+    assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+    verify(repository, never()).save(any());
+  }
+
+  @Test
+  void rejectsNullPayloadWithBadRequest() {
+    ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        () -> fileController.newFile(new File(null)));
+
+    assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+    verify(repository, never()).save(any());
+  }
 }

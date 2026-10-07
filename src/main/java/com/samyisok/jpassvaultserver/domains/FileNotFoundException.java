@@ -1,7 +1,7 @@
 package com.samyisok.jpassvaultserver.domains;
 
 public class FileNotFoundException extends RuntimeException {
-  static final long serialVersionUID = 1l;
+  static final long serialVersionUID = 1L;
 
 
   public FileNotFoundException() {

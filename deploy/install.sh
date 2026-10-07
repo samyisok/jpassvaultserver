@@ -5,7 +5,7 @@
 #
 set -euo pipefail
 
-JAR_SOURCE="${1:-build/libs/jpassvaultserver-2.0.0.jar}"
+JAR_SOURCE="${1:-build/libs/jpassvaultserver-2.1.0.jar}"
 SERVICE_USER="jpassvaultserver"
 INSTALL_DIR="/opt/jpassvaultserver"
 DATA_DIR="/var/lib/jpassvaultserver"

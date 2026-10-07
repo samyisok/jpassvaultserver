@@ -34,8 +34,9 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Build release jar
-        run: ./gradlew --no-daemon clean bootJar
+      - name: Build and verify release
+        # Runs tests, coverage verification, Checkstyle, and builds the boot jar.
+        run: ./gradlew --no-daemon clean build
 
       - name: Prepare dist directory
         run: mkdir -p dist
@@ -81,6 +82,7 @@ jobs:
         with:
           context: .
           push: true
+          provenance: true
           tags: |
             ghcr.io/${{ github.repository }}:${{ env.VERSION }}
             ghcr.io/${{ github.repository }}:latest

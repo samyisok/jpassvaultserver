@@ -28,6 +28,7 @@ public class AuthKeyFilter extends GenericFilterBean {
   static final String INVALID_CREDENTIAL_EVENT = "Invalid credential presented";
   static final String NOSNIFF_HEADER = "X-Content-Type-Options";
   static final String CACHE_CONTROL_HEADER = "Cache-Control";
+  static final int MAX_ADDRESS_LENGTH = 255;
 
   AuthKeyFilter(AuthCheck authCheck, AuthThrottle authThrottle,
       AppProperties appProperties) {
@@ -46,20 +47,23 @@ public class AuthKeyFilter extends GenericFilterBean {
 
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     String token = httpRequest.getHeader("token");
-    String address = resolveClientAddress(httpRequest);
+    String logAddress = resolveClientAddress(httpRequest);
+    // Throttle on the connection address so a client cannot evade the limit by
+    // rotating a forwarded header; the resolved address is only for logging.
+    String throttleKey = httpRequest.getRemoteAddr();
 
-    if (authThrottle.isBlocked(address)) {
+    if (authThrottle.isBlocked(throttleKey)) {
       responseWithTooManyRequests(response);
       return;
     }
 
     if (token != null && authCheck.verify(token)) {
-      authThrottle.reset(address);
+      authThrottle.reset(throttleKey);
       logIp(httpRequest);
       chain.doFilter(request, response);
     } else {
-      authThrottle.recordFailure(address);
-      getLogger().info(INVALID_CREDENTIAL_EVENT + "; ip: " + address);
+      authThrottle.recordFailure(throttleKey);
+      getLogger().info(INVALID_CREDENTIAL_EVENT + "; ip: " + logAddress);
       responseWithError(response);
     }
   }
@@ -76,16 +80,28 @@ public class AuthKeyFilter extends GenericFilterBean {
 
   String resolveClientAddress(HttpServletRequest request, boolean trustProxyHeaders) {
     if (trustProxyHeaders) {
-      String forwarded = lastForwardedValue(request.getHeader(HEADER));
+      String forwarded = sanitize(lastForwardedValue(request.getHeader(HEADER)));
       if (forwarded != null) {
         return forwarded;
       }
-      String standard = standardForwardedAddress(request.getHeader(FORWARDED_HEADER));
+      String standard = sanitize(standardForwardedAddress(request.getHeader(FORWARDED_HEADER)));
       if (standard != null) {
         return standard;
       }
     }
     return request.getRemoteAddr();
+  }
+
+  private static String sanitize(String value) {
+    if (value == null) {
+      return null;
+    }
+    String cleaned = value.replaceAll("[\\r\\n\\t]", "").trim();
+    if (cleaned.isEmpty()) {
+      return null;
+    }
+    return cleaned.length() > MAX_ADDRESS_LENGTH ? cleaned.substring(0, MAX_ADDRESS_LENGTH)
+        : cleaned;
   }
 
   private static String lastForwardedValue(String headerValue) {
@@ -129,6 +145,7 @@ public class AuthKeyFilter extends GenericFilterBean {
     HttpServletResponse resp = (HttpServletResponse) response;
     resp.reset();
     resp.setStatus(status);
+    resp.setContentType("text/plain;charset=UTF-8");
     resp.setHeader(NOSNIFF_HEADER, "nosniff");
     resp.setHeader(CACHE_CONTROL_HEADER, "no-store");
     response.setContentLength(body.length());

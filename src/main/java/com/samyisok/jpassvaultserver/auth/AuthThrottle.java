@@ -65,7 +65,9 @@ public class AuthThrottle {
   }
 
   public void reset(String source) {
-    failures.remove(normalize(source));
+    synchronized (failures) {
+      failures.remove(normalize(source));
+    }
   }
 
   private boolean isExpired(FailureState state, long now) {

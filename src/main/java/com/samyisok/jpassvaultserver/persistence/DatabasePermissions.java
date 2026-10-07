@@ -45,7 +45,9 @@ public final class DatabasePermissions {
         setPermissions(directory, DIRECTORY_PERMISSIONS);
       }
       for (Path candidate : new Path[] {databaseFile,
-          databaseFile.resolveSibling(databaseFile.getFileName() + H2_DATABASE_SUFFIX)}) {
+          databaseFile.resolveSibling(databaseFile.getFileName() + H2_DATABASE_SUFFIX),
+          databaseFile.resolveSibling(databaseFile.getFileName() + ".lock.db"),
+          databaseFile.resolveSibling(databaseFile.getFileName() + ".trace.db")}) {
         if (Files.exists(candidate)) {
           setPermissions(candidate, FILE_PERMISSIONS);
         }

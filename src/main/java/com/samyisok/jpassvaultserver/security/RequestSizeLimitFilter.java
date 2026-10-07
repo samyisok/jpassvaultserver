@@ -45,6 +45,7 @@ public class RequestSizeLimitFilter extends OncePerRequestFilter {
       throws IOException {
     response.reset();
     response.setStatus(status);
+    response.setContentType("text/plain;charset=UTF-8");
     response.setHeader(SecurityHeadersFilter.NOSNIFF_HEADER,
         SecurityHeadersFilter.NOSNIFF_VALUE);
     response.setHeader(SecurityHeadersFilter.CACHE_CONTROL_HEADER,

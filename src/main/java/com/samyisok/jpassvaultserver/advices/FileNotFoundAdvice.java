@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 @ControllerAdvice
-class AuthTokenAdvice {
+class FileNotFoundAdvice {
 
   @ResponseBody
   @ExceptionHandler(FileNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  String AuthTokenHandler(FileNotFoundException ex) {
+  String handle(FileNotFoundException ex) {
     return ex.getMessage();
   }
 }

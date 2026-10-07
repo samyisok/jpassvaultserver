@@ -53,8 +53,12 @@ class FileController {
 
   @PostMapping("/files")
   File newFile(@RequestBody File newFile) {
-    ensureWithinPayloadLimit(newFile);
-    return repository.save(newFile);
+    validatePayload(newFile);
+    File saved = repository.save(newFile);
+    // The service keeps only the newest vault payload so storage cannot grow
+    // without bound through repeated uploads.
+    repository.deleteByIdNot(saved.getId());
+    return saved;
   }
 
   @GetMapping("/files/last")
@@ -63,9 +67,12 @@ class FileController {
         .orElseThrow(() -> new FileNotFoundException());
   }
 
-  private void ensureWithinPayloadLimit(File newFile) {
+  private void validatePayload(File newFile) {
     String payload = newFile.getFile();
-    if (payload != null && payload.length() > appProperties.getMaxPayloadSize()) {
+    if (payload == null || payload.isBlank()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "file is required");
+    }
+    if (payload.length() > appProperties.getMaxPayloadSize()) {
       throw new ResponseStatusException(HttpStatus.CONTENT_TOO_LARGE,
           PAYLOAD_TOO_LARGE_MESSAGE);
     }

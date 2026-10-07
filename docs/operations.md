@@ -36,7 +36,7 @@ The server refuses to start without TLS unless
 ## systemd
 
 ```sh
-sudo deploy/install.sh build/libs/jpassvaultserver-2.0.0.jar
+sudo deploy/install.sh build/libs/jpassvaultserver-2.1.0.jar
 sudoedit /etc/jpassvaultserver.env        # set JPASSVAULT_SECRET
 sudo systemctl start jpassvaultserver
 sudo systemctl status jpassvaultserver

@@ -34,6 +34,7 @@ public class FileControllerNewFileTest {
 
   @BeforeEach
   void setUp() {
+    when(newFile.getFile()).thenReturn("payload");
     when(repository.save(newFile)).thenReturn(newFile);
   }
 

@@ -20,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class FileNotFoundAdviceTest {
 
   @Autowired
-  AuthTokenAdvice authTokenAdvice;
+  FileNotFoundAdvice fileNotFoundAdvice;
 
   @Mock
   FileNotFoundException fileNotFoundException;
@@ -32,7 +32,7 @@ public class FileNotFoundAdviceTest {
 
   @Test
   void shouldReturnGetMessage() {
-    String message = authTokenAdvice.AuthTokenHandler(fileNotFoundException);
+    String message = fileNotFoundAdvice.handle(fileNotFoundException);
     assertEquals("expected message", message);
   }
 

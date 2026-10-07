@@ -28,7 +28,15 @@ class AppPropertiesUnitTest {
   void acceptsConfiguredSecret() {
     AppProperties properties = new AppProperties();
 
-    assertDoesNotThrow(() -> properties.validateSecret("a-real-secret"));
+    assertDoesNotThrow(() -> properties.validateSecret("a-real-secret-0123456789"));
+  }
+
+  @Test
+  void rejectsShortAndWellKnownSecrets() {
+    AppProperties properties = new AppProperties();
+
+    assertThrows(IllegalStateException.class, () -> properties.validateSecret("short"));
+    assertThrows(IllegalStateException.class, () -> properties.validateSecret("change-me"));
   }
 
   @Test

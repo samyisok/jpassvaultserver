@@ -19,7 +19,7 @@ already-encrypted data; it never sees the master password.
 ./gradlew build
 JPASSVAULT_SECRET=change-me \
   APP_PROPERTIES_ALLOW_PLAIN_HTTP=true \
-  java -jar build/libs/jpassvaultserver-2.0.0.jar
+  java -jar build/libs/jpassvaultserver-2.1.0.jar
 ```
 
 The server refuses to start without a secret, and without TLS unless the

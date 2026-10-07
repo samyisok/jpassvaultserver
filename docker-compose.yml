@@ -3,14 +3,10 @@
 # JPASSVAULT_SECRET, then: docker compose up -d
 services:
   jpassvaultserver:
-    image: ghcr.io/samyisok/jpassvaultserver:2.0.0
+    image: ghcr.io/samyisok/jpassvaultserver:2.1.0
     restart: unless-stopped
     env_file:
       - ./deploy/jpassvaultserver.env
-    environment:
-      # Only because a TLS-terminating proxy is expected in front. Remove when
-      # TLS is configured in-process.
-      APP_PROPERTIES_ALLOW_PLAIN_HTTP: "true"
     ports:
       - "127.0.0.1:9393:9393"
     volumes:

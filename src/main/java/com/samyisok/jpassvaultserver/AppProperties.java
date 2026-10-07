@@ -1,5 +1,7 @@
 package com.samyisok.jpassvaultserver;
 
+import java.util.Locale;
+import java.util.Set;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.env.Environment;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,9 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "app-properties")
 public class AppProperties {
   static final String PLACEHOLDER_SECRET = "555505424923a833fe77cfa68c497bf2";
+  static final int MIN_SECRET_LENGTH = 16;
+  static final Set<String> WEAK_SECRETS = Set.of("change-me", "changeme", "secret",
+      "password", "test", "admin", "jpassvault");
   static final long DEFAULT_MAX_PAYLOAD_SIZE = 10L * 1024 * 1024;
   private static final String MASK = "****";
 
@@ -36,6 +41,14 @@ public class AppProperties {
     if (PLACEHOLDER_SECRET.equals(secret)) {
       throw new IllegalStateException(
           "The API secret is the previously committed placeholder value and must be changed");
+    }
+    if (secret.length() < MIN_SECRET_LENGTH) {
+      throw new IllegalStateException(
+          "The API secret must be at least " + MIN_SECRET_LENGTH + " characters");
+    }
+    if (WEAK_SECRETS.contains(secret.toLowerCase(Locale.ROOT))) {
+      throw new IllegalStateException(
+          "The API secret is a well-known default value and must be changed");
     }
   }
 

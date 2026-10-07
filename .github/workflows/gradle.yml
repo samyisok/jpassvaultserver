@@ -32,7 +32,8 @@ jobs:
         run: ./gradlew --no-daemon clean build
 
       - name: Dependency vulnerability scan
-        uses: dependency-check/Dependency-Check_Action@main
+        # Pinned to the v1.1.0 commit (not a mutable branch).
+        uses: dependency-check/Dependency-Check_Action@75ba02d6183445fe0761d26e836bde58b1560600
         with:
           project: jpassvaultserver
           path: '.'

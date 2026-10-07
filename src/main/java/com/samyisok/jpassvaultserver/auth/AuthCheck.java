@@ -2,27 +2,30 @@ package com.samyisok.jpassvaultserver.auth;
 
 import com.samyisok.jpassvaultserver.AppProperties;
 import com.samyisok.jpassvaultserver.security.Crypto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AuthCheck implements TokenVerifiable {
-  @Autowired
-  private AppProperties appProperties;
+  private final AppProperties appProperties;
+
+  public AuthCheck(AppProperties appProperties) {
+    this.appProperties = appProperties;
+  }
 
   @Override
   public boolean verify(String token) {
     String key = getKey();
 
     if (key == null) {
-      throw new RuntimeException("Key do not exists");
+      throw new IllegalStateException("API key is not configured");
     }
 
     return Crypto.constantTimeEquals(key, token);
   }
 
   String getKey() {
-    return appProperties.getUseSecretKeyFromEnv() ? appProperties.getEnvSecretKey()
+    return Boolean.TRUE.equals(appProperties.getUseSecretKeyFromEnv())
+        ? appProperties.getEnvSecretKey()
         : appProperties.getSecretKey();
   }
 }

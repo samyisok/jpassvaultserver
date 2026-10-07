@@ -17,6 +17,7 @@ NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true
+UMask=0077
 ReadWritePaths=/var/lib/jpassvaultserver
 
 # TLS is expected to terminate at a reverse proxy. Only set
