@@ -1,0 +1,27 @@
+[Unit]
+Description=jpassvault sync server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=jpassvaultserver
+Group=jpassvaultserver
+EnvironmentFile=/etc/jpassvaultserver.env
+WorkingDirectory=/var/lib/jpassvaultserver
+ExecStart=/usr/bin/java -jar /opt/jpassvaultserver/jpassvaultserver.jar
+Restart=always
+RestartSec=30
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/jpassvaultserver
+
+# TLS is expected to terminate at a reverse proxy. Only set
+# APP_PROPERTIES_ALLOW_PLAIN_HTTP=true in /etc/jpassvaultserver.env when the
+# service is reachable only through a trusted TLS-terminating proxy.
+
+[Install]
+WantedBy=multi-user.target

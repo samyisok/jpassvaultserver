@@ -41,4 +41,12 @@ workflow; address later.
 - Consider image signing / build provenance (cosign / SLSA) — recorded as an Open
   Question in the change design.
 
+## Deferred from add-installation
+
+- `deploy/install.sh` was syntax-checked and the systemd unit verified, but not
+  executed as root on this host. First real install is the true check.
+- A hard kill (SIGKILL) can lose recent H2 MVStore writes; backups require a
+  graceful stop (documented).
+
+
 

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add a CI pipeline with build/test, an enforced coverage floor, Checkstyle, dependency vulnerability scanning, CodeQL, Dependabot, and a tag-triggered release workflow. (`2026-10-07-add-ci-pipeline`)
 - Publish versioned release artifacts from a tag: an executable jar, a non-root container image with a health check, a CycloneDX SBOM, and SHA-256 checksums. (`2026-10-07-add-release-packaging`)
+- Add supported installation and operations: a hardened systemd unit and install script, a Docker Compose deployment with a persistent volume, a configuration reference, and backup/restore and upgrade/rollback procedures. (`2026-10-07-add-installation`)
 
 ### Changed
 

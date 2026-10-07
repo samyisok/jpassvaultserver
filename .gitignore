@@ -41,3 +41,5 @@ maindb.mv.db
 
 maindb.trace.db
 maindb.lock.db
+
+deploy/jpassvaultserver.env

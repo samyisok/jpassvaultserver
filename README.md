@@ -1,55 +1,62 @@
-[![Build(Gradle)](https://github.com/samyisok/jpassvaultserver/actions/workflows/gradle.yml/badge.svg)](https://github.com/samyisok/jpassvaultserver/actions/workflows/gradle.yml)
-![Coverage](.github/badges/jacoco.svg)
-# Jpassvaultserver for solo user
+[![CI](https://github.com/samyisok/jpassvaultserver/actions/workflows/gradle.yml/badge.svg)](https://github.com/samyisok/jpassvaultserver/actions/workflows/gradle.yml)
 
-Online sync service for [jpassvault](https://github.com/samyisok/jpassvault)
+# jpassvaultserver
 
-# Setup
+Online sync service for [jpassvault](https://github.com/samyisok/jpassvault).
 
-Build jar. 
+A small Spring Boot service that stores the encrypted vault payload uploaded by
+the desktop client and answers change-detection checksum requests. It holds
+already-encrypted data; it never sees the master password.
 
-    ./greadlew build
+## Requirements
 
-Prepare VM with your OS of choice. Ubuntu 20.04 in example.
-Create user without shell, and place jar into home dir of this user.
+- Java 25 (to build and run the jar directly), or Docker.
+- A TLS-terminating reverse proxy for any non-local deployment.
 
-    adduser --disabled-password --disabled-login jpassvaultserver
+## Build and run
 
-Create systemd service:
+```sh
+./gradlew build
+JPASSVAULT_SECRET=change-me \
+  APP_PROPERTIES_ALLOW_PLAIN_HTTP=true \
+  java -jar build/libs/jpassvaultserver-2.0.0.jar
+```
 
-    touch /etc/systemd/system/jpassvaultserver.service
-    vim /etc/systemd/system/jpassvaultserver.service
+The server refuses to start without a secret, and without TLS unless the
+plain-HTTP acknowledgment is set.
 
-Configure your service, and add secret key in Env params.
+## API
 
-    [Unit]
-    Description=jpassvaultserver instance
-    Wants=network-online.target
-    After=network-online.target
-    
-    [Service]
-    User=jpassvaultserver
-    Group=jpassvaultserver
-    Restart=always
-    RestartSec=30
-    WorkingDirectory=/home/jpassvaultserver/
-    Environment="JPASSVAULT_SECRET=*KEY_HERE*"
-    ExecStart=/usr/bin/java -jar jpassvaultserver-1.0.0.jar
-    
-    [Install]
-    WantedBy=multi-user.target
+All endpoints require a `token` header equal to the configured secret; a bad or
+missing token returns `401` with the body `Invalid API KEY`.
 
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/check` | Health/readiness: `{"check":"ok"}`. |
+| `POST` | `/files` | Store a vault payload: `{"file":"<base64>","checksum":"<optional>"}`. |
+| `GET` | `/files/last` | Return the most recently stored payload. |
+| `GET` | `/files/last/checksum` | Return the stored checksum (SHA-256 fallback) as `{"hash":"..."}`. |
 
-Reload systemd and enable service:
+A full description is in [`docs/openapi.yaml`](docs/openapi.yaml).
 
-    sudo systemctl daemon-reload
-    sudo systemctl enable example.service
-    sudo systemctl start example.service
+## Configuration
 
-Check service, it should be in running state:
+See [`docs/operations.md`](docs/operations.md) for every setting and its default.
 
-    sudo systemctl status example.service
-    
-Default port and address is 0.0.0.0:9393 but you can configure it from command line
+## Deploy
 
-    java -jar jpassvaultserver-1.0.0.jar --server.port=8080
+- **systemd:** [`deploy/install.sh`](deploy/install.sh) installs a hardened unit;
+  see [`docs/operations.md`](docs/operations.md).
+- **Container:** [`docker-compose.yml`](docker-compose.yml) runs the published
+  image with a persistent data volume.
+
+## Operations
+
+Backup, restore, upgrade, rollback, TLS, and troubleshooting:
+[`docs/operations.md`](docs/operations.md). CI and required checks:
+[`docs/ci.md`](docs/ci.md).
+
+## Contributing
+
+See [`AGENTS.md`](AGENTS.md) (added by the documentation change) and
+[`docs/ci.md`](docs/ci.md) for the local gates.
