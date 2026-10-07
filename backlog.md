@@ -20,14 +20,13 @@ Deferred items. Not blocking; address later.
 
 ## Release / supply chain
 
-- Consider image signing (cosign) beyond the buildx provenance attestation.
-- `deploy/install.sh` was syntax-checked and the systemd unit verified, but not
-  executed as root on a dev host. First real install is the true check.
+- `deploy/install.sh` is now verified end to end in a container by
+  `deploy/install-verify.sh` (file layout plus the service starting as the
+  service user). The systemd unit is checked with `systemd-analyze verify`; a
+  real systemd boot is still the final check.
 
 ## Pre-existing design smells
 
-- `domains/File.java` is a JPA entity with `@Entity`/`@Column`/`@Lob` inside the
-  `domains` package. Consider separating persistence from the domain or renaming
-  the package.
-- `FileController` holds a payload-size business rule and talks directly to the
-  repository; no application-service boundary.
+- `persistence/File.java` is a JPA entity that is also the API request/response
+  model. Acceptable while the schema is 1:1; introduce a response DTO only if the
+  API shape ever diverges from the stored row.

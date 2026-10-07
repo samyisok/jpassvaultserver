@@ -1,4 +1,4 @@
-package com.samyisok.jpassvaultserver.domains;
+package com.samyisok.jpassvaultserver.persistence;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -12,7 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 
 @SpringBootTest
-public class IntergrationFileTest {
+public class IntegrationFileTest {
   String base64 = "test-string";
   File file;
   File outputFile;
@@ -30,7 +30,7 @@ public class IntergrationFileTest {
     this.file = new File(base64);
     repository.save(this.file);
     this.outputFile =
-        repository.findFirst1ByOrderByIdDesc().stream().findFirst().orElseThrow();
+        repository.findFirstByOrderByIdDesc().orElseThrow();
   }
 
   @Test

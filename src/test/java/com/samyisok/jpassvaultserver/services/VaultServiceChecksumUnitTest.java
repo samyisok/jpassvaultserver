@@ -1,12 +1,12 @@
-package com.samyisok.jpassvaultserver.controllers;
+package com.samyisok.jpassvaultserver.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import com.samyisok.jpassvaultserver.AppProperties;
-import com.samyisok.jpassvaultserver.domains.File;
-import com.samyisok.jpassvaultserver.domains.FileRepository;
+import com.samyisok.jpassvaultserver.persistence.File;
+import com.samyisok.jpassvaultserver.persistence.FileRepository;
 import com.samyisok.jpassvaultserver.security.Crypto;
-import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +18,7 @@ import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class FileControllerChecksumUnitTest {
+class VaultServiceChecksumUnitTest {
 
   @Mock
   FileRepository repository;
@@ -27,34 +27,31 @@ class FileControllerChecksumUnitTest {
   AppProperties appProperties;
 
   @InjectMocks
-  FileController fileController;
+  VaultService vaultService;
 
   @BeforeEach
   void setUp() {
-    when(repository.findFirst1ByOrderByIdDesc()).thenReturn(List.of());
+    when(repository.findFirstByOrderByIdDesc()).thenReturn(Optional.empty());
+  }
+
+  @Test
+  void returnsEmptyWhenNoPayloadStored() {
+    assertEquals("", vaultService.lastChecksum());
   }
 
   @Test
   void echoesClientSuppliedChecksumVerbatim() {
     File stored = new File("payload", "client-hmac-value");
-    when(repository.findFirst1ByOrderByIdDesc()).thenReturn(List.of(stored));
+    when(repository.findFirstByOrderByIdDesc()).thenReturn(Optional.of(stored));
 
-    assertEquals("client-hmac-value", fileController.checksum().get("hash"));
+    assertEquals("client-hmac-value", vaultService.lastChecksum());
   }
 
   @Test
   void fallsBackToSha256WhenChecksumMissing() {
     File stored = new File("payload");
-    when(repository.findFirst1ByOrderByIdDesc()).thenReturn(List.of(stored));
+    when(repository.findFirstByOrderByIdDesc()).thenReturn(Optional.of(stored));
 
-    assertEquals(Crypto.sha256Hex("payload"), fileController.checksum().get("hash"));
-  }
-
-  @Test
-  void storesChecksumOnTheEntity() {
-    File stored = new File("payload", "client-hmac-value");
-
-    assertEquals("client-hmac-value", stored.getChecksum());
-    assertEquals("payload", stored.getFile());
+    assertEquals(Crypto.sha256Hex("payload"), vaultService.lastChecksum());
   }
 }

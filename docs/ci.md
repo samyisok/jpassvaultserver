@@ -27,6 +27,8 @@ Protect `main` and require these checks to pass before merge:
 ```sh
 ./gradlew check      # tests + JaCoCo coverage verification + Checkstyle
 ./gradlew build      # everything above plus packaging
+npx --yes @redocly/cli@1.34.5 lint docs/openapi.yaml   # OpenAPI lint
+./deploy/install-verify.sh                             # installer smoke test (Docker)
 ```
 
 Coverage thresholds live in `build.gradle`

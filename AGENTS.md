@@ -43,8 +43,12 @@ and CodeQL. See `docs/ci.md`.
 
 ## Architecture
 
-- Spring MVC `@RestController` (`FileController`) over a Spring Data JPA
-  repository (`FileRepository`) backed by an H2 file database.
+- Spring MVC `@RestController` (`FileController`) is a thin HTTP adapter over the
+  `services/VaultService` application layer, which owns payload validation, the
+  "keep only the newest payload" retention rule, and the checksum lookup.
+- `VaultService` uses a Spring Data JPA repository (`persistence/FileRepository`)
+  backed by an H2 file database; the JPA entity `persistence/File` is also the
+  API request/response model (its serialization matches the documented schema).
 - A servlet filter (`AuthKeyFilter`) authenticates every request with the shared
   `token` header; supporting components live in `auth/`, `security/`, and
   `persistence/`.

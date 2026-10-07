@@ -1,4 +1,4 @@
-package com.samyisok.jpassvaultserver.controllers;
+package com.samyisok.jpassvaultserver.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,8 +8,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.samyisok.jpassvaultserver.AppProperties;
-import com.samyisok.jpassvaultserver.domains.File;
-import com.samyisok.jpassvaultserver.domains.FileRepository;
+import com.samyisok.jpassvaultserver.persistence.File;
+import com.samyisok.jpassvaultserver.persistence.FileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class FileControllerPayloadSizeUnitTest {
+class VaultServiceStoreUnitTest {
 
   @Mock
   FileRepository repository;
@@ -32,7 +32,7 @@ class FileControllerPayloadSizeUnitTest {
   AppProperties appProperties;
 
   @InjectMocks
-  FileController fileController;
+  VaultService vaultService;
 
   @BeforeEach
   void setUp() {
@@ -44,27 +44,27 @@ class FileControllerPayloadSizeUnitTest {
     File oversized = new File("0123456789A");
 
     ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-        () -> fileController.newFile(oversized));
+        () -> vaultService.store(oversized));
 
     assertEquals(HttpStatus.CONTENT_TOO_LARGE, exception.getStatusCode());
     verify(repository, never()).save(any());
   }
 
   @Test
-  void acceptsUploadWithinLimit() {
-    File accepted = new File("small");
-    when(repository.save(accepted)).thenReturn(accepted);
+  void rejectsOversizedChecksumWithoutStoring() {
+    File oversized = new File("small", "c".repeat(257));
 
-    File result = fileController.newFile(accepted);
+    ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+        () -> vaultService.store(oversized));
 
-    assertEquals(accepted, result);
-    verify(repository, times(1)).save(accepted);
+    assertEquals(HttpStatus.CONTENT_TOO_LARGE, exception.getStatusCode());
+    verify(repository, never()).save(any());
   }
 
   @Test
   void rejectsBlankPayloadWithBadRequest() {
     ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-        () -> fileController.newFile(new File("   ")));
+        () -> vaultService.store(new File("   ")));
 
     assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
     verify(repository, never()).save(any());
@@ -73,9 +73,30 @@ class FileControllerPayloadSizeUnitTest {
   @Test
   void rejectsNullPayloadWithBadRequest() {
     ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-        () -> fileController.newFile(new File(null)));
+        () -> vaultService.store(new File(null)));
 
     assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
     verify(repository, never()).save(any());
+  }
+
+  @Test
+  void acceptsUploadWithinLimit() {
+    File accepted = new File("small");
+    when(repository.save(accepted)).thenReturn(accepted);
+
+    File result = vaultService.store(accepted);
+
+    assertEquals(accepted, result);
+    verify(repository, times(1)).save(accepted);
+  }
+
+  @Test
+  void keepsOnlyNewestByDeletingOtherRows() {
+    File accepted = new File("small");
+    when(repository.save(accepted)).thenReturn(accepted);
+
+    vaultService.store(accepted);
+
+    verify(repository, times(1)).deleteByIdNot(accepted.getId());
   }
 }

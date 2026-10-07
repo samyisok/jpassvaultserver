@@ -1,4 +1,4 @@
-package com.samyisok.jpassvaultserver.domains;
+package com.samyisok.jpassvaultserver.persistence;
 
 import java.time.Instant;
 import com.fasterxml.jackson.annotation.JsonProperty;

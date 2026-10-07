@@ -1,11 +1,11 @@
-package com.samyisok.jpassvaultserver.domains;
+package com.samyisok.jpassvaultserver.persistence;
 
-import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FileRepository extends JpaRepository<File, Long> {
 
-  List<File> findFirst1ByOrderByIdDesc();
+  Optional<File> findFirstByOrderByIdDesc();
 
   long deleteByIdNot(Long id);
 }

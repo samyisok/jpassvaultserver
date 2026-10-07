@@ -1,7 +1,7 @@
 package com.samyisok.jpassvaultserver.advices;
 
 
-import com.samyisok.jpassvaultserver.domains.FileNotFoundException;
+import com.samyisok.jpassvaultserver.services.FileNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

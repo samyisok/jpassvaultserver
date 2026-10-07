@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Store the H2 database in a dedicated owner-only `./data` directory by default (was the process working directory) and create it before startup; existing deployments that relied on the default must set `SPRING_DATASOURCE_URL` to keep their previous database file. (`stabilize-persistence-and-operations`)
 - Give the security filters a defined order so authentication is evaluated before payload limits (`401` takes precedence over `411`/`413`). (`stabilize-persistence-and-operations`)
 - Base `File` equality and hashing on the persistent id instead of the payload. (`stabilize-persistence-and-operations`)
+- Move the JPA entity and repository to `persistence/` and introduce a `services/VaultService` application layer; the HTTP contract is unchanged. (`refactor-architecture`)
 
 ### Deprecated
 
