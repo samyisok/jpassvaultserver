@@ -10,11 +10,11 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @SpringBootTest
 class AuthCheckVerifyTest {
-  @SpyBean
+  @MockitoSpyBean
   private AuthCheck authCheck;
 
   private String envToken = "env-token";

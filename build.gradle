@@ -1,46 +1,34 @@
 plugins {
-	id 'org.springframework.boot' version '2.4.4'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'org.springframework.boot' version '4.1.1'
+	id 'io.spring.dependency-management' version '1.1.7'
 	id 'java'
 	id 'jacoco'
 }
 
 group = 'com.samyisok'
-version = '1.0.1'
-sourceCompatibility = '11'
+version = '2.0.0'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+}
 
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
-
 
 jacocoTestReport {
-    reports {
-        csv.enabled true
-    }
-}
-
-bootRun {
-    environment = ["JPASSVAULT_SECRET": "local-secret-key-test" ]
-}
-
-task debugRun(dependsOn:bootRun) {
-		group = 'Application'
-    gradle.taskGraph.whenReady { graph ->
-        if (graph.hasTask(debugRun)) {
-            bootRun {
-							  jvmArgs=["-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=33333"]
-                // debug = true
-            }
-        }
-    }
+	reports {
+		csv.required = true
+		xml.required = true
+	}
 }
 
 repositories {
 	mavenCentral()
-	jcenter()
 }
 
 dependencies {
@@ -48,11 +36,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	runtimeOnly 'com.h2database:h2'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    testImplementation 'org.mockito:mockito-inline:3.9.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.9.0'
-	testImplementation 'org.mockito:mockito-core:3.9.0'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {

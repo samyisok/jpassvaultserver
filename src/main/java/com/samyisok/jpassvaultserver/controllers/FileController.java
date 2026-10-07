@@ -4,8 +4,8 @@ package com.samyisok.jpassvaultserver.controllers;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.Map;
-import javax.xml.bind.DatatypeConverter;
 import com.samyisok.jpassvaultserver.domains.File;
 import com.samyisok.jpassvaultserver.domains.FileNotFoundException;
 import com.samyisok.jpassvaultserver.domains.FileRepository;
@@ -46,8 +46,7 @@ class FileController {
       md = MessageDigest.getInstance("MD5");
       md.update(fileDb.getBytes());
       byte[] digest = md.digest();
-      checksum = DatatypeConverter
-          .printHexBinary(digest).toUpperCase();
+      checksum = HexFormat.of().withUpperCase().formatHex(digest);
     } catch (NoSuchAlgorithmException e) {
     }
 

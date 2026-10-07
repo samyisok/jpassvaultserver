@@ -38,3 +38,6 @@ out/
 demodb.mv.db
 demodb.trace.db
 maindb.mv.db
+
+maindb.trace.db
+maindb.lock.db
