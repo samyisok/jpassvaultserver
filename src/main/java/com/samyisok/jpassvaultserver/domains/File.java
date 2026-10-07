@@ -21,6 +21,9 @@ public class File {
   @Column(name = "file")
   private String file;
 
+  @Column(name = "checksum")
+  private String checksum;
+
   @CreatedDate
   private Instant createdDate;
 
@@ -32,6 +35,11 @@ public class File {
 
   public File(String base64) {
     this.file = base64;
+  }
+
+  public File(String base64, String checksum) {
+    this.file = base64;
+    this.checksum = checksum;
   }
 
   /**
@@ -54,6 +62,14 @@ public class File {
    */
   public void setFile(String file) {
     this.file = file;
+  }
+
+  public String getChecksum() {
+    return checksum;
+  }
+
+  public void setChecksum(String checksum) {
+    this.checksum = checksum;
   }
 
   /*

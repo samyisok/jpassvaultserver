@@ -34,7 +34,7 @@ class AppPropertiesTest {
 	void shouldGetObjectDumpFromToString() {
 		String dump = appProperties.toString();
 
-		assertEquals(dump, "AppProperties [secretKey=secretKey, useSecretKeyFromEnv=true]");
+		assertEquals(dump, "AppProperties [secretKey=****, useSecretKeyFromEnv=true]");
 	}
 
 }

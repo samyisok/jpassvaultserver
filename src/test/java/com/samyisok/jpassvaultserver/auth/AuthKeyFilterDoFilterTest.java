@@ -4,6 +4,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +35,9 @@ public class AuthKeyFilterDoFilterTest {
   @MockitoSpyBean
   AuthCheck authCheck;
 
+  @MockitoBean
+  AuthThrottle authThrottle;
+
   @Mock
   HttpServletRequest request;
 
@@ -43,14 +48,18 @@ public class AuthKeyFilterDoFilterTest {
   FilterChain chain;
 
   private String token = "test-token";
+  private String ip = "127.0.0.1";
 
   @BeforeEach
   public void setUp() throws Exception {
     when(request.getHeader(anyString())).thenReturn(token);
+    when(request.getRemoteAddr()).thenReturn(ip);
     when(authCheck.getKey()).thenReturn(token);
+    when(authThrottle.isBlocked(any())).thenReturn(false);
     when(authKeyFilter.getLogger()).thenReturn(logger);
     doNothing().when(authKeyFilter).logIp(request);
-    doNothing().when(authKeyFilter).responseWithError(response);;
+    doNothing().when(authKeyFilter).responseWithError(response);
+    doNothing().when(authKeyFilter).responseWithTooManyRequests(response);
   }
 
   @Test
@@ -80,11 +89,11 @@ public class AuthKeyFilterDoFilterTest {
   }
 
   @Test
-  void shouldCallInfo() throws Exception {
+  void shouldLogConstantEventWithoutToken() throws Exception {
     when(authCheck.getKey()).thenReturn("another-token");
     authKeyFilter.doFilter(request, response, chain);
     verify(authKeyFilter, times(1)).getLogger();
-    verify(logger, times(1)).info("Invalid Token: " + token);
+    verify(logger, times(1)).info(AuthKeyFilter.INVALID_CREDENTIAL_EVENT + "; ip: " + ip);
   }
 
   @Test
@@ -99,5 +108,12 @@ public class AuthKeyFilterDoFilterTest {
     when(request.getHeader(anyString())).thenReturn(null);
     authKeyFilter.doFilter(request, response, chain);
     verify(authKeyFilter, times(1)).responseWithError(response);
+  }
+
+  @Test
+  void shouldCallResponseWithTooManyRequestsIfBlocked() throws Exception {
+    when(authThrottle.isBlocked(ip)).thenReturn(true);
+    authKeyFilter.doFilter(request, response, chain);
+    verify(authKeyFilter, times(1)).responseWithTooManyRequests(response);
   }
 }

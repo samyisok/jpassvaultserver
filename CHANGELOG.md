@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgrade the sync server to Java 25 and Spring Boot 4.1.1 (Jakarta namespace) on Gradle 9.8.1; the HTTP API and stored data are unchanged. (`2026-10-07-modernize-java-stack`)
+- Return the client-supplied change-detection value verbatim (SHA-256 fallback) instead of an unkeyed MD5. (`2026-10-07-harden-server-security`)
 
 ### Deprecated
 
@@ -20,3 +21,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+- Remove the committed API secret, require an externally supplied secret, compare tokens in constant time, keep tokens out of logs, require TLS unless explicitly acknowledged, bound request payloads, throttle repeated failures, and make the H2 data directory owner-only. (`2026-10-07-harden-server-security`)

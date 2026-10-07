@@ -1,6 +1,7 @@
 package com.samyisok.jpassvaultserver.auth;
 
 import com.samyisok.jpassvaultserver.AppProperties;
+import com.samyisok.jpassvaultserver.security.Crypto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,7 @@ public class AuthCheck implements TokenVerifiable {
       throw new RuntimeException("Key do not exists");
     }
 
-    return key.equals(token);
+    return Crypto.constantTimeEquals(key, token);
   }
 
   String getKey() {

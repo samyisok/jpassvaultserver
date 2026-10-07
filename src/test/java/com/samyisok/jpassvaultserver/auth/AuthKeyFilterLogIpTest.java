@@ -5,6 +5,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -45,26 +46,24 @@ class AuthKeyFilterLogIpTest {
   }
 
   @Test
-  void shouldCallGetHeader() throws Exception {
+  void shouldIgnoreForwardedHeaderByDefault() throws Exception {
     assertDoesNotThrow(() -> authKeyFilter.logIp(request));
-    verify(request).getHeader(AuthKeyFilter.HEADER);
-    verify(request, never()).getRemoteAddr();
+
+    verify(request, never()).getHeader(AuthKeyFilter.HEADER);
+    verify(request, times(1)).getRemoteAddr();
     verify(request, times(1)).getContextPath();
     verify(logger, times(1)).info("Correct Auth; ip: " + ip + "\n path: "
         + contextPath);
   }
 
   @Test
-  void shouldCallGetRemoteAddr() {
-    when(request.getHeader(anyString())).thenReturn(null);
+  void shouldUseForwardedHeaderWhenTrustEnabled() {
+    when(request.getHeader(AuthKeyFilter.HEADER)).thenReturn(ip);
 
-    assertDoesNotThrow(() -> authKeyFilter.logIp(request));
+    String address = authKeyFilter.resolveClientAddress(request, true);
 
-    verify(request).getHeader(AuthKeyFilter.HEADER);
-    verify(request, times(1)).getRemoteAddr();
-    verify(request, times(1)).getContextPath();
-    verify(logger, times(1)).info("Correct Auth; ip: " + ip + "\n path: "
-        + contextPath);
+    verify(request, times(1)).getHeader(AuthKeyFilter.HEADER);
+    assertEquals(ip, address);
   }
 
 }
