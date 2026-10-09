@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix the release workflow (set up Buildx so the requested image provenance attestation succeeds) and make the CI OWASP dependency scan conditional on an `NVD_API_KEY` secret so CI is green without one. (`2026-10-09-fix-ci-and-release-pipeline`)
+
 ### Security
 
 - Pin third-party GitHub Actions to immutable commit SHAs, lint the OpenAPI specification in CI, and move the container `latest` tag only for stable releases. (`stabilize-persistence-and-operations`)

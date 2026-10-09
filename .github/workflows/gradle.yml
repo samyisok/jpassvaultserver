@@ -38,6 +38,9 @@ jobs:
         run: ./deploy/install-verify.sh
 
       - name: Dependency vulnerability scan
+        # Requires the NVD_API_KEY repository secret (dependency-check >= 9);
+        # skipped when it is absent, with Dependabot still providing alerts.
+        if: ${{ secrets.NVD_API_KEY != '' }}
         # Pinned to the v1.1.0 commit (not a mutable branch).
         uses: dependency-check/Dependency-Check_Action@75ba02d6183445fe0761d26e836bde58b1560600
         with:
@@ -47,6 +50,7 @@ jobs:
           args: >
             --failOnCVSS 7
             --enableRetired
+            --nvdApiKey ${{ secrets.NVD_API_KEY }}
 
       - name: Upload test, coverage, and analysis reports
         if: always()

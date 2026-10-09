@@ -3,17 +3,23 @@
 ## Workflows
 
 - `.github/workflows/gradle.yml` — CI: build, tests, JaCoCo coverage
-  verification, Checkstyle, OpenAPI lint, dependency vulnerability scan, report
-  upload. Runs on every push to `main` and every pull request targeting `main`.
+  verification, Checkstyle, OpenAPI lint, installer smoke test, and (when the
+  `NVD_API_KEY` secret is set) an OWASP dependency scan. Runs on every push to
+  `main` and every pull request targeting `main`.
 - `.github/workflows/codeql.yml` — CodeQL analysis on push/PR and weekly.
 - `.github/workflows/release.yml` — tag-triggered release; verifies the tag
   matches `build.gradle`'s `version`, builds the jar, generates an SBOM and
-  checksums, pushes the image (moving `latest` only for stable versions), and
-  publishes a GitHub release.
-- `.github/dependabot.yml` — weekly Gradle and GitHub Actions update proposals.
+  checksums, pushes the image (with Buildx provenance; moving `latest` only for
+  stable versions), and publishes a GitHub release.
+- `.github/dependabot.yml` — weekly Gradle and GitHub Actions update proposals,
+  and vulnerability alerts when no NVD API key is configured.
 
 Third-party Actions are pinned to immutable commit SHAs (with a `# vX` comment);
 Dependabot keeps the pins current.
+
+The OWASP dependency scan needs a free NVD API key stored as the `NVD_API_KEY`
+repository secret. Without it the step is skipped and Dependabot provides
+vulnerability alerting.
 
 ## Required status checks
 

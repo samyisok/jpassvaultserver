@@ -38,8 +38,10 @@ server.
 - JaCoCo coverage ≥ 85% line and ≥ 70% branch (`build.gradle`);
 - Checkstyle (`config/checkstyle/checkstyle.xml`).
 
-CI (`.github/workflows/gradle.yml`) additionally runs an OWASP dependency scan
-and CodeQL. See `docs/ci.md`.
+CI (`.github/workflows/gradle.yml`) additionally runs an OpenAPI lint, an
+installer smoke test, and (when an `NVD_API_KEY` repository secret is configured)
+an OWASP dependency scan; vulnerability alerts without a key come from
+Dependabot. See `docs/ci.md`.
 
 ## Architecture
 
